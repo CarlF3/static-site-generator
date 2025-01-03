@@ -22,5 +22,15 @@ class TestHTMLNode(unittest.TestCase):
         node = ParentNode(None, [LeafNode(None, "Some text")])
         self.assertRaises(ValueError)
 
+    def test_parent_as_child(self):
+        node = ParentNode("div", [ParentNode("p", [
+            LeafNode("i", "Italic Text"),
+            LeafNode(None, "Plain Text"),
+            LeafNode("b", "Bold Text"),
+            LeafNode("a", "A link", {"href": "https://www.google.com/", "target": "_blank"}),
+        ])])
+        result = '<div><p><i>Italic Text</i>Plain Text<b>Bold Text</b><a href="https://www.google.com/" target="_blank">A link</a></p></div>'
+        self.assertEqual(node.to_html(), result)
+
 if __name__ == "__main__":
     unittest.main()
