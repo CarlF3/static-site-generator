@@ -14,7 +14,11 @@ class TestHTMLNode(unittest.TestCase):
         result = '<p><b>Bolded text</b>Some plain text<a href="https://www.google.com/" target="_blank">A link</a>Some more plain text</p>'
         self.assertEqual(node.to_html(), result)
 
-    def test_no_childen(self):
+    def test_no_children(self):
+        node = ParentNode("div", None)
+        self.assertRaises(ValueError)
+
+    def test_empty_children(self):
         node = ParentNode("div", [])
         self.assertRaises(ValueError)
 
@@ -30,6 +34,17 @@ class TestHTMLNode(unittest.TestCase):
             LeafNode("a", "A link", {"href": "https://www.google.com/", "target": "_blank"}),
         ])])
         result = '<div><p><i>Italic Text</i>Plain Text<b>Bold Text</b><a href="https://www.google.com/" target="_blank">A link</a></p></div>'
+        self.assertEqual(node.to_html(), result)
+
+    def test_parent_and_children(self):
+        node = ParentNode("div", [ParentNode("p", [
+            LeafNode("i", "Italic Text"),
+            LeafNode(None, "Plain Text"),
+            LeafNode("b", "Bold Text"),
+            LeafNode("a", "A link", {"href": "https://www.google.com/", "target": "_blank"}),
+        ]), LeafNode(None, "More Plain Text")
+        ])
+        result = '<div><p><i>Italic Text</i>Plain Text<b>Bold Text</b><a href="https://www.google.com/" target="_blank">A link</a></p>More Plain Text</div>'
         self.assertEqual(node.to_html(), result)
 
 if __name__ == "__main__":
