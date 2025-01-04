@@ -1,5 +1,5 @@
 import unittest
-from textsplitter import split_nodes_delimiter
+from textsplitter import split_nodes_delimiter, split_nodes_image, split_nodes_link
 from textnode import TextNode, TextType
 
 class TestTextSplitter(unittest.TestCase):
@@ -43,6 +43,19 @@ class TestTextSplitter(unittest.TestCase):
         nodes = split_nodes_delimiter([TextNode(text, TextType.NORMAL)], delimiter, TextType.CODE)
         expected = [TextNode(text, TextType.NORMAL)]
         self.assertEqual(nodes, expected)
+
+    def test_extract_images(self):
+        nodes = [TextNode("This is text with multiple ![multiple_icon](multiple.gif) images ![images_icon](images.png)", TextType.NORMAL)]
+        result = split_nodes_image(nodes)
+        expected = [TextNode("This is text with multiple ", TextType.NORMAL), TextNode("multiple_icon", TextType.IMAGE, "multiple.gif"), TextNode(" images ", TextType.NORMAL), TextNode("images_icon", TextType.IMAGE, "images.png")]
+        self.assertEqual(result, expected)
+
+    def test_extract_links(self):
+        nodes = [TextNode("This text has multiple [links](https://www.google.com/) to different [places](https://www.bing.com/).", TextType.NORMAL)]
+        result = split_nodes_link(nodes)
+        expected = [TextNode("This text has multiple ", TextType.NORMAL), TextNode("links", TextType.LINK, "https://www.google.com/"), TextNode(" to different ", TextType.NORMAL), TextNode("places", TextType.LINK, "https://www.bing.com/"), TextNode(".", TextType.NORMAL)]
+        self.assertEqual(result, expected)
+
 
 if __name__ == "__main__":
     unittest.main()
