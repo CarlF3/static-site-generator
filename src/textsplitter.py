@@ -14,14 +14,19 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             if text == "":
                 continue
             if i%2 == 0:
+                #print("****** Normnal", text)
                 new_nodes.append(TextNode(text, node.text_type))
             else:
+                #print("****** Bold", text)
                 new_nodes.append(TextNode(text, text_type))
     return new_nodes
 
 def split_nodes_image(old_nodes):
     new_nodes = []
     for node in old_nodes:
+        if not node.text_type == TextType.NORMAL:
+            new_nodes.append(node)
+            continue
         matches = extract_markdown_images(node.text)
         remaining = node.text
         for alt, url in matches:
@@ -35,6 +40,9 @@ def split_nodes_image(old_nodes):
 def split_nodes_link(old_nodes):
     new_nodes = []
     for node in old_nodes:
+        if not node.text_type == TextType.NORMAL:
+            new_nodes.append(node)
+            continue
         matches = extract_markdown_links(node.text)
         remaining = node.text
         for link_text, url in matches:
