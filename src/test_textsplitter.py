@@ -1,5 +1,5 @@
 import unittest
-from textsplitter import split_nodes_delimiter, split_nodes_image, split_nodes_link
+from textsplitter import split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_TextNodes
 from textnode import TextNode, TextType
 
 class TestTextSplitter(unittest.TestCase):
@@ -56,6 +56,23 @@ class TestTextSplitter(unittest.TestCase):
         expected = [TextNode("This text has multiple ", TextType.NORMAL), TextNode("links", TextType.LINK, "https://www.google.com/"), TextNode(" to different ", TextType.NORMAL), TextNode("places", TextType.LINK, "https://www.bing.com/"), TextNode(".", TextType.NORMAL)]
         self.assertEqual(result, expected)
 
+    def test_extract_from_text(self):
+        self.maxDiff = None
+        text = "This is text with **bold** and *italic* words, a `code block`, a ![cat](cat.png) and a [link](https://boot.dev)"
+        result = text_to_TextNodes(text)
+        expected = [
+            TextNode("This is text with ", TextType.NORMAL),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" and ", TextType.NORMAL),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" words, a ", TextType.NORMAL),
+            TextNode("code block", TextType.CODE),
+            TextNode(", a ", TextType.NORMAL),
+            TextNode("cat", TextType.IMAGE, "cat.png"),
+            TextNode(" and a ", TextType.NORMAL),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        self.assertEqual(result, expected)
 
 if __name__ == "__main__":
     unittest.main()
