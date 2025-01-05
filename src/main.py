@@ -5,8 +5,11 @@ from markdownconverter import markdown_to_html_node
 
 def main():
     clear_public()
+    print("================")
     copy_content_to_public("./static")
-    generate_page("./content/index.md", "./template.html", "./public/index.html")
+    print("================")
+    #generate_page("./content/index.md", "./template.html", "./public/index.html")
+    generate_pages_recursive("./content", "./template.html", "./public")
 
 def clear_public():
     public_dir = "./public"
@@ -48,7 +51,7 @@ def generate_page(src, tem, dst):
     print(f"Generating page from {src} to {dst} using {tem} as a template.")
     # if destination dir doesn't exist create it
     if not os.path.exists(os.path.dirname(dst)):
-        os.mkdirs(os.path.dirname(dst))
+        os.makedirs(os.path.dirname(dst))
     if os.path.exists(src) and os.path.exists(tem):
         with open(src) as s:
             with open(tem) as t:
@@ -60,4 +63,16 @@ def generate_page(src, tem, dst):
                 page = template.replace("{{ Content }}", html).replace("{{ Title }}", title)
                 with open(dst, 'w') as d:
                     d.write(page)
+
+def generate_pages_recursive(src, tem, dst):
+    if os.path.exists(src):
+        files = os.listdir(src)
+        for file in files:
+            file_path = os.path.join(src, file)
+            if os.path.isdir(file_path):
+                generate_pages_recursive(file_path, tem, os.path.join(dst, file))
+            else:
+                file_name = '.'.join(file.split('.')[:-1])
+                if file.split('.')[-1] == "md":
+                    generate_page(file_path, tem, os.path.join(dst, f"{file_name}.html"))
 main()
