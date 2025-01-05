@@ -1,10 +1,12 @@
 from textnode import TextNode, TextType
 import os
 import shutil
+from markdownconverter import markdown_to_html_node
 
 def main():
     clear_public()
     copy_content_to_public("./static")
+    generate_page("./content/index.md", "./template.html", "./public/index.html")
 
 def clear_public():
     public_dir = "./public"
@@ -41,4 +43,21 @@ def extract_title(markdown):
     if title == None:
         raise ValueError("No h1 header was found for title")
     return title
+
+def generate_page(src, tem, dst):
+    print(f"Generating page from {src} to {dst} using {tem} as a template.")
+    # if destination dir doesn't exist create it
+    if not os.path.exists(os.path.dirname(dst)):
+        os.mkdirs(os.path.dirname(dst))
+    if os.path.exists(src) and os.path.exists(tem):
+        with open(src) as s:
+            with open(tem) as t:
+                md = s.read()
+                title = extract_title(md)
+                template = t.read()
+                node = markdown_to_html_node(md)
+                html = node.to_html()
+                page = template.replace("{{ Content }}", html).replace("{{ Title }}", title)
+                with open(dst, 'w') as d:
+                    d.write(page)
 main()
