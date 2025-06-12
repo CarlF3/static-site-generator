@@ -4,7 +4,9 @@ import shutil
 import sys
 from markdownconverter import markdown_to_html_node
 
-basepath = sys.argv[1] or "/"
+basepath = ""
+if len(sys.argv) > 1:
+    basepath = sys.argv[1]
 
 def main():
     clear_public()
@@ -64,7 +66,7 @@ def generate_page(src, tem, dst, basepath):
                 node = markdown_to_html_node(md)
                 html = node.to_html()
                 page = template.replace("{{ Content }}", html).replace("{{ Title }}", title)
-                links = page.replace("href=\"/", f"href=\"{basepath}").replace("src=\"/", f"src=\"{basepath}")
+                links = page.replace("href=\"/", f"href=\"{basepath}/").replace("src=\"/", f"src=\"{basepath}/")
                 with open(dst, 'w') as d:
                     d.write(links)
 
